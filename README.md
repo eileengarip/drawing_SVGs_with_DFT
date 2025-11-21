@@ -62,4 +62,4 @@ This forms the mathematical and computational content for the Edinburgh coursewo
 
 6. Compute the DFT
    The sampled points $x[n]$ (as complex numbers) are transformed using:
-   $$ X_k = \sum_{n=0}^{N-1} x[n] , e^{-2\pi i k n / N}. $$
+   $$X_k = \sum_{n=0}^{N-1} x[n],e^{-2\pi*i*k*n/N}$$

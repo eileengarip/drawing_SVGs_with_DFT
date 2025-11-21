@@ -61,8 +61,56 @@ This forms the mathematical and computational content for the Edinburgh coursewo
    We walk along segments and pick points spaced equally in total curve length. This ensures uniform speed     around the drawing, correct DFT behaviour, and smooth epicycle animation.
 
 6. Compute the DFT
-   A sampled curve \( x[n] \) is transformed using the Discrete Fourier Transform:
+   A sampled points are transformed using the Discrete Fourier Transform. (Expain more in the poster, the      math behind)
 
-   \[
-   X_k = \sum_{n=0}^{N-1} x[n] e^{-2\pi i k n / N}.
-   \]
+7. Animate Epicycles
+   Beginning at the origin, each term draws a rotating vector that adds onto all previous vectors, whose       end traces the SVG outline. This recreates the thistle using pure Fourier series.
+
+<h2>Files in this Project</h2>
+
+```
+thistle.svg        # Input SVG file
+fourier_trace.py   # Full Python source code
+README.md          # This file
+```
+
+<h2>Dependencies</h2>
+- Python 3
+- NumPy
+- Matplotlib
+- xml.etree.ElementTree (built-in)
+
+install with:
+
+```
+pip install numpy matplotlib
+```
+
+<h2>How to Run</h2>
+
+```
+python fourier_trace.py
+```
+
+This will:
+- Parse the SVG
+- Sample the path
+- Compute Fourier coefficients
+- Generate an animation window
+- Plot the reconstructed drawing
+
+<h2>References</h2>
+
+1. YouTube: “But what is a Fourier series? From heat flow to drawing with circles (DE4)”
+2. SVG Path specification — W3C
+3. Notes on Bézier curves — Pomax
+4. NumPy FFT Documentation
+5. Jason Davies — Fourier Drawing
+6. Matplotlib Animation Docs
+7. Wolfram MathWorld — “Arc Length”
+8. re (Regular Expression) Python Docs
+9. Brigham, E. O. The Fast Fourier Transform and Its Applications
+10. Oppenheim & Schafer — Discrete-Time Signal Processing
+11. Python xml.etree.ElementTree Documentation
+12. Inkscape / Illustrator SVG documentation
+13. The LLM ChatGPT_o4 was used for some of the finer implementation details, such as regex's.

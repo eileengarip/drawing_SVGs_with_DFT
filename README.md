@@ -32,4 +32,32 @@ This forms the mathematical and computational content for the Edinburgh coursewo
 
 2. Tokenise SVG Path
    SVG path strings contain commands (M, L, C, etc.) mixed with numbers.
-    We convert them into a clean list of tokens: 
+    We convert them into a clean list of tokens:
+
+   ```
+   ['M', 100, 200, 'C', 120,180, 150,160, 200,200, ...]
+   ```
+
+   A regex breaks the string into commands + floats. This allows us to iterate through commands.
+
+3. Convert Path Commands into Geometric Segments
+
+   Example output:
+
+   ```
+   ('L', p0, p1)
+   ('Q', p0, control, end)
+   ('C', p0, c1, c2, end)
+   ```
+
+   Each tuple describes ONE geometric segment. For example, ('L', cur, new) means a line segment from the      current point to the new point. Complex numbers (e.g. 20 + 50j) store 2-D points conveniently.
+
+4. Compute Length of Each Segment
+   - For straight lines, length is exact.
+   - For Bézier curves, we approximate by sampling them at 80 points and summing tiny distances.
+   - This is required for uniform arc-length sampling.
+
+5. Sample the Entire Path at Even Spacing
+   We walk along segments and pick points spaced equally in total curve length. This ensures uniform speed     around the drawing, correct DFT behaviour, and smooth epicycle animation.
+
+6. Compute the DFT

@@ -61,3 +61,5 @@ This forms the mathematical and computational content for the Edinburgh coursewo
    We walk along segments and pick points spaced equally in total curve length. This ensures uniform speed     around the drawing, correct DFT behaviour, and smooth epicycle animation.
 
 6. Compute the DFT
+   The sampled points $x[n]$ (as complex numbers) are transformed using:
+   $$ X_k = \sum_{n=0}^{N-1} x[n] , e^{-2\pi i k n / N}. $$

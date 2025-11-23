@@ -219,7 +219,9 @@ for seg, count in zip(segments, samples_per_segment): #zip makes every segment p
         for t in ts:
             points.append(quad_bezier(p0,p1,p2,t))
 
-z = np.array(points, dtype=complex)
+points_flipped = [complex(p.real, -p.imag) for p in points]
+#needed to flip the points because of a mismatch of matplotlib and SVG coords for the y axis, this stops the shape from being upside down
+z = np.array(points, dtype=complex) 
 # normalize & center 
 z = z - np.mean(z) 
 z = z / np.max(np.abs(z))
@@ -235,89 +237,96 @@ k_list = np.arange(-N//2, N//2) #creates the list of frequency indices, pairs pe
 mags = np.abs(C_shifted) #magnitudes of each Fourier coefficient
 order = np.argsort(mags)[::-1] #returns indices smallest -> largest ([::1] reverses order) needed because biggest circles first in the animation
 
-#Reconstructs the curve using only the M largest Fourier coefficients.
-def reconstruct_from_topM(M, t_samples):
-    idx = order[:M]
-    ks = k_list[idx]
-    Cs = C_shifted[idx]
-    res = np.zeros_like(t_samples, dtype=complex) #starts with a blank complex curve
-    for k, ck in zip(ks, Cs):
-        res += ck * np.exp(1j * 2*np.pi * k * t_samples) #in this loop each term adds C_k(e^(i2pikt))
-    return res, ks, Cs #returns the reconstructed curve, the ks and Cs used
+# -------------------------------------------------
+# Epicycle animation (uses top M coefficients)
+# -------------------------------------------------
+import matplotlib.animation as animation
 
-t_cont = np.linspace(0,1,N,endpoint=False)
+M = 60  # number of epicycles to draw
+frames = 800  # how many frames in the final animation (more = smoother)
+t_vals = np.linspace(0, 1, frames)
 
-# Save reconstructions for example M values
-for M in (5,25,100):
-    recon, _, _ = reconstruct_from_topM(M, t_cont)
-    plt.figure(figsize=(6,6))
-    plt.plot(z.real, z.imag, linestyle='--', linewidth=1)
-    plt.plot(recon.real, recon.imag, linewidth=1)
-    plt.gca().set_aspect('equal')
-    plt.title(f"Original and Reconstruction (Top {M} coefficients)")
-    plt.xlabel("Real"); plt.ylabel("Imag")
-    plt.tight_layout()
-    out = OUT_DIR / f"reconstruction_top{M}.png"
-    plt.savefig(out, bbox_inches='tight', dpi=200)
-    plt.close()
-    print("Saved:", out)
+# Select top M coefficients
+idx = order[:M]
+ks = k_list[idx]
+Cs = C_shifted[idx]
 
-# Spectrum plot
-plt.figure(figsize=(6,4))
-plt.plot(k_list, mags)
-plt.yscale('log')
-plt.title("Magnitude of Fourier coefficients (log scale)")
-plt.xlabel("Frequency index k"); plt.ylabel("|c_k|")
-plt.tight_layout()
-out = OUT_DIR / "fourier_magnitude_spectrum.png"
-plt.savefig(out, bbox_inches='tight', dpi=200)
-plt.close()
-print("Saved:", out)
-
-# Epicycles snapshot (top 30 coefficients) at t0
-M_epic = 30
-idxs = order[:M_epic]
-ks = k_list[idxs]
-Cs = C_shifted[idxs]
+# Sort so that largest circles are drawn first
 perm = np.argsort(np.abs(Cs))[::-1]
-ks = ks[perm]; Cs = Cs[perm]
-t0 = 0.12
-positions = [0+0j]
-for k, ck in zip(ks, Cs):
-    positions.append(positions[-1] + ck * np.exp(1j * 2*np.pi * k * t0))
+ks = ks[perm]
+Cs = Cs[perm]
 
-plt.figure(figsize=(6,6))
-plt.plot(z.real, z.imag, linestyle='--', linewidth=1, alpha=0.6)
-for i, (k, ck) in enumerate(zip(ks, Cs)):
-    prev = positions[i]; curr = positions[i+1]
-    r = abs(ck)
-    circle_t = np.linspace(0, 2*np.pi, 200)
-    plt.plot(prev.real + r*np.cos(circle_t), prev.imag + r*np.sin(circle_t), linewidth=0.8)
-    plt.plot([prev.real, curr.real],[prev.imag, curr.imag], linewidth=1)
-plt.scatter([positions[-1].real],[positions[-1].imag], s=30)
-plt.gca().set_aspect('equal')
-plt.title(f"Epicycles (top {M_epic}) at t={t0:.2f}")
-plt.xlabel("Real"); plt.ylabel("Imag")
-plt.tight_layout()
-out = OUT_DIR / "epicycles_snapshot.png"
-plt.savefig(out, bbox_inches='tight', dpi=200)
-plt.close()
-print("Saved:", out)
+# Prepare the figure
+fig, ax = plt.subplots(figsize=(6, 6))
+ax.set_aspect('equal')
 
-# Export top coefficients to CSV
-topN = 50
-top_idx = order[:topN]
-top_k = k_list[top_idx]
-top_C = C_shifted[top_idx]
-df = pd.DataFrame({
-    "k": top_k,
-    "magnitude": np.abs(top_C),
-    "phase": np.angle(top_C),
-    "real": np.real(top_C),
-    "imag": np.imag(top_C)
-})
-csv_out = OUT_DIR / "top_coefficients.csv"
-df.to_csv(csv_out, index=False)
-print("Saved:", csv_out)
-print("\nPreview of top coefficients:")
-print(df.head(10).to_string(index=False))
+# Artists for circles and vectors
+circle_artists = []
+line_artists = []
+for _ in range(M):
+    circ, = ax.plot([], [], 'b-', alpha=0.3, linewidth=0.6)
+    line, = ax.plot([], [], 'k-', linewidth=1)
+    circle_artists.append(circ)
+    line_artists.append(line)
+
+# Traced output curve
+trace_x, trace_y = [], []
+trace_line, = ax.plot([], [], 'r-', linewidth=1.2)
+
+# Set axis limits based on original shape
+ax.set_xlim(np.min(z.real) * 1.3, np.max(z.real) * 1.3)
+ax.set_ylim(np.min(z.imag) * 1.3, np.max(z.imag) * 1.3)
+ax.set_title(f"Epicycle Animation (Top {M} coefficients)")
+
+# -----------------------------
+# Frame update function
+# -----------------------------
+def update(frame_idx):
+    t = t_vals[frame_idx]
+
+    # compute positions of epicycle chain
+    pos = 0 + 0j
+    positions = [pos]
+
+    for k, c in zip(ks, Cs):
+        pos = pos + c * np.exp(1j * 2*np.pi * k * t)
+        positions.append(pos)
+
+    # Update circles + lines
+    for i, (k, c) in enumerate(zip(ks, Cs)):
+        center = positions[i]
+        end = positions[i+1]
+        r = abs(c)
+
+        # Circle
+        theta = np.linspace(0, 2*np.pi, 150)
+        circle_artists[i].set_data(
+            center.real + r*np.cos(theta),
+            center.imag + r*np.sin(theta)
+        )
+
+        # Radius line
+        line_artists[i].set_data(
+            [center.real, end.real],
+            [center.imag, end.imag]
+        )
+
+    # Update red traced path
+    trace_x.append(positions[-1].real)
+    trace_y.append(positions[-1].imag)
+    trace_line.set_data(trace_x, trace_y)
+
+    return circle_artists + line_artists + [trace_line]
+
+# -----------------------------
+# Create animation
+# -----------------------------
+anim = animation.FuncAnimation(
+    fig, update, frames=frames, interval=20, blit=True
+)
+
+# Save animation (choose GIF or MP4)
+# anim.save("epicycles.gif", fps=30)
+# anim.save("epicycles.mp4", fps=30)
+
+plt.show()

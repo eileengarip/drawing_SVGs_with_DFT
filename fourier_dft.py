@@ -242,9 +242,9 @@ order = np.argsort(mags)[::-1] #returns indices smallest -> largest ([::1] rever
 # -------------------------------------------------
 import matplotlib.animation as animation
 
-M = 60  # number of epicycles to draw
+M = 80  # number of epicycles to draw
 frames = 800  # how many frames in the final animation (more = smoother)
-t_vals = np.linspace(0, 1, frames)
+t_vals = np.linspace(0, 1, frames) #equally spaced time values for number of frames you set
 
 # Select top M coefficients
 idx = order[:M]

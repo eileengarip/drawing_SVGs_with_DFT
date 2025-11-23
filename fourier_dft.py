@@ -268,13 +268,13 @@ line_artists = []
 # ^ these are python lists that will store the matplotlib Line2D objects for each epicycle.
 for _ in range(M):
     circ, = ax.plot([], [], 'b-', alpha=0.3, linewidth=0.6) # comma after circ to unpack the object - ax.plot always returns list
-    line, = ax.plot([], [], 'k-', linewidth=1)
+    line, = ax.plot([], [], 'k-', linewidth=1) #both line and circ are empty Line2D objects, so adding data makes lines like this
     circle_artists.append(circ)
     line_artists.append(line)
 
 # Traced output curve
 trace_x, trace_y = [], []
-trace_line, = ax.plot([], [], 'r-', linewidth=1.2)
+trace_line, = ax.plot([], [], 'r-', linewidth=1.2) #trace_line is another empty Line2D object with pink line style and 1.2 width
 
 # Set axis limits based on original shape
 ax.set_xlim(np.min(z.real) * 1.3, np.max(z.real) * 1.3)

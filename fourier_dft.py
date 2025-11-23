@@ -267,7 +267,7 @@ circle_artists = []
 line_artists = []
 # ^ these are python lists that will store the matplotlib Line2D objects for each epicycle.
 for _ in range(M):
-    circ, = ax.plot([], [], 'b-', alpha=0.3, linewidth=0.6)
+    circ, = ax.plot([], [], 'b-', alpha=0.3, linewidth=0.6) # comma after circ to unpack the object - ax.plot always returns list
     line, = ax.plot([], [], 'k-', linewidth=1)
     circle_artists.append(circ)
     line_artists.append(line)

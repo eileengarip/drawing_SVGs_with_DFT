@@ -212,7 +212,7 @@ for seg, count in zip(segments, samples_per_segment): #zip makes every segment p
         p0,p1,p2,p3 = seg[1],seg[2],seg[3],seg[4]
         ts = np.linspace(0, 1, count, endpoint=False)
         for t in ts:
-            points.append(cubic_bezier(p0,p1,p2,p3,t)) #similar for cubic and quadratic curves, but here were using the cubic_bezier func to generate the points.
+            points.append(cubic_bezier(p0,p1,p2,p3,t)) #similar for cubic and quadratic curves, but here we're using the cubic_bezier func to generate the points.
     elif seg[0] == 'Q':
         p0,p1,p2 = seg[1],seg[2],seg[3]
         ts = np.linspace(0, 1, count, endpoint=False)
@@ -227,20 +227,23 @@ z = z / np.max(np.abs(z))
 # --- DFT ---
 N = len(z) #number of samples in the sequence
 C = np.fft.fft(z) / N #numpy has a built-in function that applies the DFT to each complex number, but it doesn't normalise automatically, so divide by N
-#^ gives us the Fourier coefficients
+#^ gives us the Fourier coefficients to describe each epicycle (FFT stands for fast Fourier transform- an efficient algorithm for computing the DFT)
+#each element in this list C is a complex number with real and imaginary parts, can be converted into exponential form to get (magnitude = radius, angle = starting phase, frequency)
+#by using FFT, the INDEX of the list is what corresponds to the frequency
 C_shifted = np.fft.fftshift(C) #center with 0 frequency at the middle
-k_list = np.arange(-N//2, N//2)
-mags = np.abs(C_shifted)
-order = np.argsort(mags)[::-1]
+k_list = np.arange(-N//2, N//2) #creates the list of frequency indices, pairs perfectly with the C_shifted
+mags = np.abs(C_shifted) #magnitudes of each Fourier coefficient
+order = np.argsort(mags)[::-1] #returns indices smallest -> largest ([::1] reverses order) needed because biggest circles first in the animation
 
+#Reconstructs the curve using only the M largest Fourier coefficients.
 def reconstruct_from_topM(M, t_samples):
     idx = order[:M]
     ks = k_list[idx]
     Cs = C_shifted[idx]
-    res = np.zeros_like(t_samples, dtype=complex)
+    res = np.zeros_like(t_samples, dtype=complex) #starts with a blank complex curve
     for k, ck in zip(ks, Cs):
-        res += ck * np.exp(1j * 2*np.pi * k * t_samples)
-    return res, ks, Cs
+        res += ck * np.exp(1j * 2*np.pi * k * t_samples) #in this loop each term adds C_k(e^(i2pikt))
+    return res, ks, Cs #returns the reconstructed curve, the ks and Cs used
 
 t_cont = np.linspace(0,1,N,endpoint=False)
 

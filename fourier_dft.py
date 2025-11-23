@@ -259,6 +259,8 @@ Cs = Cs[perm]
 # Prepare the figure
 fig, ax = plt.subplots(figsize=(6, 6))
 ax.set_aspect('equal')
+ax.set_xlabel("Real")
+ax.set_ylabel("Imaginary")
 
 # Artists for circles and vectors
 circle_artists = []

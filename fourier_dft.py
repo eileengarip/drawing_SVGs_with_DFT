@@ -265,6 +265,7 @@ ax.set_ylabel("Imaginary")
 # Artists for circles and vectors
 circle_artists = []
 line_artists = []
+# ^ these are python lists that will store the matplotlib Line2D objects for each epicycle.
 for _ in range(M):
     circ, = ax.plot([], [], 'b-', alpha=0.3, linewidth=0.6)
     line, = ax.plot([], [], 'k-', linewidth=1)

@@ -105,12 +105,11 @@ This will:
 2. SVG Path specification — W3C
 3. Notes on Bézier curves — Pomax
 4. NumPy FFT Documentation
-5. Jason Davies — Fourier Drawing
-6. Matplotlib Animation Docs
-7. Wolfram MathWorld — “Arc Length”
-8. re (Regular Expression) Python Docs
-9. Brigham, E. O. The Fast Fourier Transform and Its Applications
-10. Oppenheim & Schafer — Discrete-Time Signal Processing
-11. Python xml.etree.ElementTree Documentation
-12. Inkscape / Illustrator SVG documentation
-13. The LLM ChatGPT_o4 was used for some of the finer implementation details, such as regex's.
+5. Matplotlib Animation Docs
+6. Wolfram MathWorld — “Arc Length”
+7. re (Regular Expression) Python Docs
+8. Brigham, E. O. The Fast Fourier Transform and Its Applications
+9. Oppenheim & Schafer — Discrete-Time Signal Processing
+10. Python xml.etree.ElementTree Documentation
+11. Inkscape / Illustrator SVG documentation
+12. The LLM ChatGPT_o4 was used for some of the finer implementation details, such as regex's.

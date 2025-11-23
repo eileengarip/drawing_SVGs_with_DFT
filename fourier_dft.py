@@ -182,11 +182,11 @@ def segment_length(seg):
     elif seg[0] == 'Q':
         p0,p1,p2 = seg[1],seg[2],seg[3]
         ts = np.linspace(0,1,80)
-        pts = [quad_bezier(p0,p1,p2,t) for t in ts] #for each t, copute a point on the bezier curve
-        return float(np.sum(np.abs(np.diff(pts)))) #this computers the sum of the distances between each consecutive point.
-        #this is the numberical arc length estimation ^^^ 
+        pts = [quad_bezier(p0,p1,p2,t) for t in ts] #for each t, compute a point on the bezier curve
+        return float(np.sum(np.abs(np.diff(pts)))) #this computes the sum of the distances between each consecutive point.
+        #this is the numerical arc length estimation ^^^ 
     else:
-        return 0.0 #fallback for SVG commants like A (our code doesn't deal with this)
+        return 0.0 #fallback for SVG commands like A (our code doesn't deal with this)
 
 lengths = [segment_length(s) for s in segments]
 total_length = sum(lengths)
@@ -202,17 +202,17 @@ while sum(samples_per_segment) != N_TOTAL:
 
 # --- Sample points along segments ---
 points = []
-for seg, count in zip(segments, samples_per_segment): #zip makes every segment paired in a tuble with the number of samples in that segment
+for seg, count in zip(segments, samples_per_segment): #zip makes every segment paired in a tuple with the number of samples needed in that segment
     if seg[0] == 'L':
         p0, p1 = seg[1], seg[2]
-        ts = np.linspace(0, 1, count, endpoint=False)
+        ts = np.linspace(0, 1, count, endpoint=False) #np.linspace takes in a range from 0 to 1 and returns (count) number of evenly spaced t's (between 0 and 1)
         for t in ts:
-            points.append(p0*(1-t) + p1*t)
+            points.append(p0*(1-t) + p1*t) #find points by plugging the t's into the equation of the line between the two points, to get samples (points on that line)
     elif seg[0] == 'C':
         p0,p1,p2,p3 = seg[1],seg[2],seg[3],seg[4]
         ts = np.linspace(0, 1, count, endpoint=False)
         for t in ts:
-            points.append(cubic_bezier(p0,p1,p2,p3,t))
+            points.append(cubic_bezier(p0,p1,p2,p3,t)) #similar for cubic and quadratic curves, but here were using the cubic_bezier func to generate the points.
     elif seg[0] == 'Q':
         p0,p1,p2 = seg[1],seg[2],seg[3]
         ts = np.linspace(0, 1, count, endpoint=False)
@@ -220,14 +220,15 @@ for seg, count in zip(segments, samples_per_segment): #zip makes every segment p
             points.append(quad_bezier(p0,p1,p2,t))
 
 z = np.array(points, dtype=complex)
-# normalize & center
-z = z - np.mean(z)
+# normalize & center 
+z = z - np.mean(z) 
 z = z / np.max(np.abs(z))
 
 # --- DFT ---
-N = len(z)
-C = np.fft.fft(z) / N
-C_shifted = np.fft.fftshift(C)
+N = len(z) #number of samples in the sequence
+C = np.fft.fft(z) / N #numpy has a built-in function that applies the DFT to each complex number, but it doesn't normalise automatically, so divide by N
+#^ gives us the Fourier coefficients
+C_shifted = np.fft.fftshift(C) #center with 0 frequency at the middle
 k_list = np.arange(-N//2, N//2)
 mags = np.abs(C_shifted)
 order = np.argsort(mags)[::-1]

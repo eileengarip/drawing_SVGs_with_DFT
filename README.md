@@ -111,5 +111,4 @@ This will:
 8. Brigham, E. O. The Fast Fourier Transform and Its Applications
 9. Oppenheim & Schafer — Discrete-Time Signal Processing
 10. Python xml.etree.ElementTree Documentation
-11. Inkscape / Illustrator SVG documentation
-12. The LLM ChatGPT_o4 was used for some of the finer implementation details, such as regex's.
+11. The LLM ChatGPT_o4 was used for some of the finer implementation details, such as regex's.

@@ -277,7 +277,7 @@ trace_x, trace_y = [], []
 trace_line, = ax.plot([], [], 'r-', linewidth=1.2) #trace_line is another empty Line2D object with pink line style and 1.2 width
 
 # Set axis limits based on original shape
-ax.set_xlim(np.min(z.real) * 1.3, np.max(z.real) * 1.3)
+ax.set_xlim(np.min(z.real) * 1.3, np.max(z.real) * 1.3) #so the epicycles don’t get cut off at the edges of the plot.
 ax.set_ylim(np.min(z.imag) * 1.3, np.max(z.imag) * 1.3)
 ax.set_title(f"Epicycle Animation (Top {M} coefficients)")
 
@@ -285,7 +285,7 @@ ax.set_title(f"Epicycle Animation (Top {M} coefficients)")
 # Frame update function
 # -----------------------------
 def update(frame_idx):
-    t = t_vals[frame_idx]
+    t = t_vals[frame_idx] #get current time t
 
     # compute positions of epicycle chain
     pos = 0 + 0j
@@ -314,22 +314,20 @@ def update(frame_idx):
             [center.imag, end.imag]
         )
 
-    # Update red traced path
-    trace_x.append(positions[-1].real)
+    # Update traced path
+    trace_x.append(positions[-1].real) #the last position is the actual path to plot!
     trace_y.append(positions[-1].imag)
     trace_line.set_data(trace_x, trace_y)
 
-    return circle_artists + line_artists + [trace_line]
+    return circle_artists + line_artists + [trace_line] #returns a list of all Line2D objects that were updated by this frame (no need to redraw everything)
+    #only these change so these are the only things that need to be redrawn
 
 # -----------------------------
 # Create animation
 # -----------------------------
 anim = animation.FuncAnimation(
     fig, update, frames=frames, interval=20, blit=True
-)
-
-# Save animation (choose GIF or MP4)
-# anim.save("epicycles.gif", fps=30)
-# anim.save("epicycles.mp4", fps=30)
+)#in this function, update is called once for each frame passing in the frame index from 0 -> frames-1
+#blit=True optimizes the animation by only redrawing objects changing, interval controls speed
 
 plt.show()

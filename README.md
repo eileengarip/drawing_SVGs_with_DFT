@@ -3,9 +3,9 @@
 
 This project takes an SVG image, extracts its path data, samples the path into a sequence of evenly spaced points, and then uses a Discrete Fourier Transform (DFT) to reconstruct the shape using rotating circles, also known as epicycles.
 
-This workflow is inspired by the YouTube video“But what is a Fourier series? From heat flow to drawing with circles (DE4)”, which demonstrates how Fourier series can describe closed curves.
+This workflow is inspired by the YouTube video: “But what is a Fourier series? From heat flow to drawing with circles (DE4)”. The video demonstrates how Fourier series can describe closed curves.
 
-The result is a fully animated Fourier reconstruction of any SVG outline. You can choose any simple SVG by loading a different SVG in the code.
+The result is a fully animated Fourier reconstruction of any SVG outline. You can choose any simple SVG by loading a different SVG_PATH. Here, we use the math-pi SVG.
 
 Project Goals
 - Convert an SVG path (with lines and Bézier curves) into sampled coordinate points.

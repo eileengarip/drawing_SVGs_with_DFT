@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pathlib import Path
 
-SVG_FILE = "math_pi.svg"
+SVG_FILE = "math-pi.svg"
 OUT_DIR = Path(".") #Allows us to save all output files (PNG, CDV, etc. to current directory)
 N_TOTAL = 2048  # number of sample points around the entire shape - why?: it's a power of 2, fast FFT
 # 2048 is enough points to accurately represent curves

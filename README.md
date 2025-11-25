@@ -5,7 +5,7 @@ This project takes an SVG image, extracts its path data, samples the path into a
 
 This workflow is inspired by the YouTube video“But what is a Fourier series? From heat flow to drawing with circles (DE4)”, which demonstrates how Fourier series can describe closed curves.
 
-The result is a fully animated Fourier reconstruction of any SVG outline; here, we use a thistle illustration (A symbol for Edinburgh!)
+The result is a fully animated Fourier reconstruction of any SVG outline. You can choose any simple SVG by loading a different SVG in the code.
 
 Project Goals
 - Convert an SVG path (with lines and Bézier curves) into sampled coordinate points.

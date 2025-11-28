@@ -9,8 +9,8 @@ SVG_FILE = "math-pi.svg"
 N_TOTAL = 2048  # number of sample points around the entire shape - why?: it's a power of 2, fast FFT
 # 2048 is enough points to accurately represent curves
 
-#The Idea is that the SVG path is a continuous curve abd we replace it with 2048 evenly spaced sample points.
-#Each point becomes a complex number (z[k] = x[k] + y_i) <- this gets fed int fourier transform.
+#The Idea is that the SVG path is a continuous curve and we replace it with 2048 evenly spaced sample points.
+#Each point becomes a complex number (z[k] = x[k] + y_i) <- this gets fed into the fourier transform.
 
 # --- Minimal SVG path parser (supports M, L, H, V, C, Q, Z; absolute & relative) ---
 token_re = re.compile(r'([MmZzLlHhVvCcQq])|([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)')
@@ -34,7 +34,7 @@ token_re = re.compile(r'([MmZzLlHhVvCcQq])|([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)')
 #This function scans the SVG text
 #finds all commands and numbers
 #turns them into a clean list of tokens
-#converts numbers to python floats and leaves commands as letters
+#converts numbers to Python floats and leaves commands as letters
 def tokenize_path(d):
     tokens = token_re.findall(d)
     result = [] 
@@ -59,7 +59,7 @@ def cubic_bezier(p0, p1, p2, p3, t):
 def quad_bezier(p0, p1, p2, t):
     return ( (1-t)**2 * p0 + 2*(1-t)*t*p1 + t**2 * p2 )
 
-#This function takes the SVG path string, and turns it into a list of segments the computer
+#This function takes the SVG path string, and turns it into a list of segments that the computer
 #can understand
 def path_segments_from_d(d):
     tokens = tokenize_path(d) #calling our previously defined function
@@ -73,9 +73,9 @@ def path_segments_from_d(d):
         if isinstance(tok, str): #detect whether token is a command or number
             cmd = tok
         else:
-            # repeat previous command if a number appears where command expected
-            #why? this is because svg shortcuts mean svg presents something like this, 
-            #L 10 20 30 40 but mean L 10 20 L 30 40, so if its a number repeat command.
+            # repeat previous command if a number appears where a command is expected
+            #why? This is because SVG shortcuts mean SVG presents something like this, 
+            #L 10 20 30 40, but mean L 10 20 L 30 40, so if it's a number repeat command.
             if last_cmd is None:
                 raise ValueError("Path data starts with a number without a command.")
             cmd = last_cmd
